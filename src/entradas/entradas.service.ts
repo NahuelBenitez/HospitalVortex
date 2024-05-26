@@ -56,6 +56,12 @@ export class EntradasService {
       where: { tipo: TipoEntrada.Consulta}, // Filtrar por el tipo de entrada 'consulta'
       select: ['id', 'tipo', 'motivoConsulta', 'diagnostico', 'confirmadoDiagnostico'],
     });
+  } 
+   async findAllPracticas(): Promise<Partial<Entrada>[]> {
+    return this.entradaRepository.find({
+      where: { tipo: TipoEntrada.Practica}, // Filtrar por el tipo de entrada 'consulta'
+      select: ['id', 'tipo', 'duracionProcedimiento', 'complicaciones', 'resultadoFinal'],
+    });
   }
 
   async update(id: number, updateMedicalEntryDto: UpdateEntradaDto): Promise<Entrada> {

@@ -16,6 +16,11 @@ export class EntradasController {
   findAllConsultas() {
     return this.entradasService.findAllConsultas();
   }
+  
+  @Get('practica')
+  findAllPracticas() {
+    return this.entradasService.findAllPracticas();
+  }
   @Get()
   findAll() {
     return this.entradasService.findAll();
