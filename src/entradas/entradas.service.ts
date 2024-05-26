@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Entrada } from './entities/entrada.entity';
+import { Entrada, TipoEntrada } from './entities/entrada.entity';
 import { HistoriaClinica } from 'src/historia-clinica/entities/historia-clinica.entity';
 import { Medico } from 'src/medicos/entities/medico.entity';
 import { CreateEntradaDto } from './dto/create-entrada.dto';
@@ -50,6 +50,12 @@ export class EntradasService {
 
   findOne(id: number): Promise<Entrada> {
     return this.entradaRepository.findOne({ where: { id } });
+  }
+  async findAllConsultas(): Promise<Partial<Entrada>[]> {
+    return this.entradaRepository.find({
+      where: { tipo: TipoEntrada.Consulta}, // Filtrar por el tipo de entrada 'consulta'
+      select: ['id', 'tipo', 'motivoConsulta', 'diagnostico', 'confirmadoDiagnostico'],
+    });
   }
 
   async update(id: number, updateMedicalEntryDto: UpdateEntradaDto): Promise<Entrada> {

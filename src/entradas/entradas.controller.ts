@@ -12,6 +12,10 @@ export class EntradasController {
     return this.entradasService.create(createEntradaDto);
   }
 
+  @Get('consulta')
+  findAllConsultas() {
+    return this.entradasService.findAllConsultas();
+  }
   @Get()
   findAll() {
     return this.entradasService.findAll();

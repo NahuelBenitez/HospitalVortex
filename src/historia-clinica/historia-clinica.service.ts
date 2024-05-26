@@ -29,7 +29,7 @@ export class HistoriaClinicaService {
       throw new HttpException('Failed to fetch medical histories', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
+  
   findOne(id: number) {
     return `This action returns a #${id} historiaClinica`;
   }

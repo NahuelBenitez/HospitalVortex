@@ -17,6 +17,11 @@ export class HistoriaClinicaController {
     return this.historiaClinicaService.findAll();
   }
 
+  @Get('consulta')
+  findAllConsultas() {
+    // Llamar al servicio para obtener las historias clínicas con los campos especificados
+    return this.historiaClinicaService.findAll();
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.historiaClinicaService.findOne(+id);
