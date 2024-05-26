@@ -1,5 +1,5 @@
 import { BaseEntity } from "src/config/base.entity";
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, DeleteDateColumn, Entity, JoinColumn, OneToOne } from "typeorm";
 import { HistoriaClinica } from "src/historia-clinica/entities/historia-clinica.entity";
 
 @Entity()
@@ -23,4 +23,6 @@ export class Paciente extends BaseEntity {
         cascade: true,
       })
     historiaClinica: HistoriaClinica;
+    @DeleteDateColumn({ name: 'deleted_at' })
+    deletedAt: Date; // Columna para el soft delete
 }
