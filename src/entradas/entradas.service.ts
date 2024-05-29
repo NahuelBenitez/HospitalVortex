@@ -7,6 +7,21 @@ import { Medico } from 'src/medicos/entities/medico.entity';
 import { CreateEntradaDto } from './dto/create-entrada.dto';
 import { UpdateEntradaDto } from './dto/update-entrada.dto';
 
+
+// Interfaz para definir la estructura exacta de los objetos de salida
+export interface EntradaDTO {
+  id: number;
+  tipo: TipoEntrada;
+  motivoConsulta: string | null;
+  diagnostico: string | null;
+  confirmadoDiagnostico: boolean | null;
+  duracionProcedimiento: number | null;
+  complicaciones: string | null;
+  resultadoFinal: string | null;
+  medico: { id: number; nombre: string; apellido: string } | null;
+  paciente: { id: number; nombre: string; apellido: string } | null;
+  fecha: Date;
+}
 @Injectable()
 export class EntradasService {
   constructor(
@@ -44,16 +59,48 @@ export class EntradasService {
     }
   }
 
-  async findAll(): Promise<Entrada[]> {
+  // async findAll(): Promise<Entrada[]> {
+  //   try {
+  //     const entradas : Entrada[] = await this.entradaRepository.find({relations:['enfermedadDiagnostico']});
+  //     if (entradas.length === 0) {
+  //       throw new Error('No se encontraron entradas');
+  //     }
+  //     return entradas;
+  //   } catch (error) {
+  //     throw new Error(`Error al buscar entradas: ${error.message}`);
+
+  //   }
+  // }
+
+  async findAll(): Promise<EntradaDTO[]> {
     try {
-      const entradas : Entrada[] = await this.entradaRepository.find({relations:['enfermedadDiagnostico']});
-      if (entradas.length === 0) {
-        throw new Error('No se encontraron entradas');
+      const entradas: Partial<Entrada>[] = await this.entradaRepository.find({
+        relations: ['enfermedadDiagnostico', 'medico', 'historiaClinica', 'historiaClinica.paciente'],
+      });
+
+      // Filtrar las entradas que están asociadas a historias clínicas de pacientes no borrados lógicamente
+      const entradasFiltradas = entradas.filter(entrada => entrada.historiaClinica.paciente !== null);
+
+      if (entradasFiltradas.length === 0) {
+        throw new Error('No se encontraron entradas válidas');
       }
-      return entradas;
+
+      // Mapear las entradas para ajustar el formato de respuesta
+      return entradasFiltradas.map(entrada => ({
+        id: entrada.id,
+        tipo: entrada.tipo,
+        motivoConsulta: entrada.motivoConsulta,
+        diagnostico: entrada.diagnostico,
+        confirmadoDiagnostico: entrada.confirmadoDiagnostico,
+        duracionProcedimiento: entrada.duracionProcedimiento,
+        complicaciones: entrada.complicaciones,
+        resultadoFinal: entrada.resultadoFinal,
+        medico: entrada.medico ? { id: entrada.medico.id, nombre: entrada.medico.name, apellido: entrada.medico.lastName } : null,
+        paciente: entrada.historiaClinica.paciente ? { id: entrada.historiaClinica.paciente.id, nombre: entrada.historiaClinica.paciente.name, apellido: entrada.historiaClinica.paciente.lastName } : null,
+        fecha: entrada.createdAt, // Asumiendo que la fecha de creación se almacena en 'createdAt'
+      }));
     } catch (error) {
       throw new Error(`Error al buscar entradas: ${error.message}`);
-
     }
   }
 
@@ -72,7 +119,25 @@ export class EntradasService {
       select: ['id', 'tipo', 'duracionProcedimiento', 'complicaciones', 'resultadoFinal'],
     });
   }
+  // Service
+async findAllByDateRange(from: Date, to: Date): Promise<Entrada[]> {
+  // Ajustar las fechas para que incluyan todo el rango de ese día
+  const fromDate = new Date(from);
+  fromDate.setHours(0, 0, 0, 0); // Establecer la hora a 00:00:00.000
+  const toDate = new Date(to);
+  toDate.setHours(23, 59, 59, 999); // Establecer la hora a 23:59:59.999 del mismo día
+  toDate.setDate(toDate.getDate() + 1); // Agregar un día para incluir el día 'to'
 
+  // Construir la consulta con TypeORM
+  const queryBuilder = this.entradaRepository.createQueryBuilder('entrada')
+    .leftJoinAndSelect('entrada.enfermedadDiagnostico', 'enfermedad')
+    .where('entrada.createdAt >= :from AND entrada.createdAt < :to', { from: fromDate, to: toDate });
+
+  // Ejecutar la consulta y devolver el resultado
+  return queryBuilder.getMany();
+}
+
+  
   async update(id: number, updateMedicalEntryDto: UpdateEntradaDto): Promise<Entrada> {
     const medicalEntry = await this.entradaRepository.findOne({where:{id}});
 

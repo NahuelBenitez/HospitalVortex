@@ -9,6 +9,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import database from './config/database';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EnfermedadesModule } from './enfermedades/enfermedades.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -34,7 +36,7 @@ import { EnfermedadesModule } from './enfermedades/enfermedades.module';
 
     }),
 
-    MedicosModule, PacientesModule, HistoriaClinicaModule, EntradasModule, EnfermedadesModule],
+    MedicosModule, PacientesModule, HistoriaClinicaModule, EntradasModule, EnfermedadesModule, AuthModule, UsersModule],
   controllers: [AppController],
   providers: [AppService],
 })
