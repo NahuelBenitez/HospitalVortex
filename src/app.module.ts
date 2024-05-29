@@ -8,6 +8,7 @@ import { EntradasModule } from './entradas/entradas.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import database from './config/database';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EnfermedadesModule } from './enfermedades/enfermedades.module';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
     }),
 
-    MedicosModule, PacientesModule, HistoriaClinicaModule, EntradasModule],
+    MedicosModule, PacientesModule, HistoriaClinicaModule, EntradasModule, EnfermedadesModule],
   controllers: [AppController],
   providers: [AppService],
 })

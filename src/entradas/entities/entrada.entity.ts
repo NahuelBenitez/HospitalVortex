@@ -2,6 +2,7 @@ import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 't
 import { BaseEntity } from 'src/config/base.entity';
 import { HistoriaClinica } from 'src/historia-clinica/entities/historia-clinica.entity';
 import { Medico } from 'src/medicos/entities/medico.entity';
+import { Enfermedades } from 'src/enfermedades/entities/enfermedade.entity';
 
 export enum TipoEntrada {
   Consulta = 'consulta',
@@ -40,4 +41,9 @@ export class Entrada extends BaseEntity {
   @ManyToOne(() => Medico, medico => medico.entradas)
   @JoinColumn({ name: 'medico_id' })
   medico: Medico;
+
+  
+  @ManyToOne(() => Enfermedades, enfermedad => enfermedad) // Eliminar .entradas aquí
+  enfermedadDiagnostico: Enfermedades;
+
 }

@@ -44,8 +44,17 @@ export class EntradasService {
     }
   }
 
-  findAll(): Promise<Entrada[]> {
-    return this.entradaRepository.find();
+  async findAll(): Promise<Entrada[]> {
+    try {
+      const entradas : Entrada[] = await this.entradaRepository.find({relations:['enfermedadDiagnostico']});
+      if (entradas.length === 0) {
+        throw new Error('No se encontraron entradas');
+      }
+      return entradas;
+    } catch (error) {
+      throw new Error(`Error al buscar entradas: ${error.message}`);
+
+    }
   }
 
   findOne(id: number): Promise<Entrada> {

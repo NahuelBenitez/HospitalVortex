@@ -19,7 +19,7 @@ export class HistoriaClinicaService {
   async findAll(): Promise<HistoriaClinica[]> {
     try {
       const medicalHistories: HistoriaClinica[] = await this.historiaClinicaRepository.find({
-        relations: ['paciente', 'entradas', 'entradas.medico'],
+        relations: ['paciente', 'entradas', 'entradas.medico', 'entradas.enfermedadDiagnostico'],
       });
       if (medicalHistories.length === 0) {
         throw new HttpException('No medical histories found', HttpStatus.NOT_FOUND);

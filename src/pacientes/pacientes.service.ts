@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreatePacienteDto } from './dto/create-paciente.dto';
 import { UpdatePacienteDto } from './dto/update-paciente.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -43,20 +43,22 @@ export class PacientesService {
 
     }
   }
-  async  findOne(id: number) {
+  public async findOne(id: number): Promise<Paciente> {
     try {
-     const patient: Paciente = await this.pacienteRepository.findOne( { 
-       where:{id},
-       relations: ['medicalHistory'] });
-     if(!patient){
-       throw new Error('No se encontró el paciente con el ID proporcionado');
-     }
-     return patient;
+      const paciente: Paciente = await this.pacienteRepository.findOne(
+        {
+          where: { id },
+          relations: ['historiaClinica'],
+        }
+      );
+      if (!paciente) {
+        throw new HttpException('Failed to find result', HttpStatus.BAD_REQUEST);
+      }
+      return paciente;
     } catch (error) {
-     throw new Error(`Error al buscar pacientes: ${error.message}`);
+      throw new HttpException('Failed to find patient', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-   }
- 
+  }
    async update(id: number, body: UpdatePacienteDto): Promise<UpdateResult> {
      try {
        const updateResult: UpdateResult = await this.pacienteRepository.update(id, body);
